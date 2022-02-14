@@ -1,5 +1,5 @@
 # fanucpy
-# The Python package to facilitate online robot programming for FANUC industrial robots
+# Python package for FANUC industrial robots
 
 ## Software contents
 The package consists of two parts: 
