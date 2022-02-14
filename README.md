@@ -1,5 +1,10 @@
 # fanucpy: Python package for FANUC industrial robots
 
+## Acknowledgements
+This work was developed at the [Institute for Advanced Manufacturing at the University of Nottingham](https://www.nottingham.ac.uk/ifam/index.aspx) as a part of the [Digital Manufacturing and Design Training Network](https://dimanditn.eu/).
+
+This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No 814078.
+
 ## Software contents
 The package consists of two parts: 
 1. Robot interface code written in Python programming language
@@ -66,8 +71,3 @@ print(f"Current pose: {robot.get_curpos()}")
 print(f"Current joints: {robot.get_curjpos()}")
 print(f"Instantaneous power: {robot.get_ins_power()}")
 ```
-
-## Acknowledgements
-This work was developed at the [Institute for Advanced Manufacturing at the University of Nottingham](https://www.nottingham.ac.uk/ifam/index.aspx) as a part of the [Digital Manufacturing and Design Training Network](https://dimanditn.eu/).
-
-This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No 814078.
