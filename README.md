@@ -1,5 +1,4 @@
-# fanucpy
-# Python package for FANUC industrial robots
+# fanucpy: Python package for FANUC industrial robots
 
 ## Software contents
 The package consists of two parts: 
