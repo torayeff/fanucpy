@@ -1,0 +1,65 @@
+----------------------------------------------------
+-- Author:              Agajan Torayev
+-- Email:               torayeff@gmail.com
+-- Homepage:            https://torayeff.com
+-- Copyright:           Agajan Torayev
+-- Description:         Manufacturing Apps
+--                      Development Kit (MAPPDK) 
+--                      Driver for FANUC robots.
+----------------------------------------------------
+PROGRAM MAPPDK_LOGGER
+%STACKSIZE = 4000
+%NOLOCKGROUP
+%NOPAUSE = ERROR + COMMAND + TPENABLE
+%ALPHABETIZE
+%COMMENT = 'MAPPDK LOGGER V0.0.1'
+
+VAR
+    comm_file:          FILE
+    status:             INTEGER
+    entry:              INTEGER
+    cmd:                STRING[254]
+    resp:               STRING[254]
+    keep_conn:          BOOLEAN
+    
+CONST
+    SERVER_TAG_NUM = 7
+    PORT_NUMBER = 18736
+
+
+-- Include routines
+%INCLUDE mappdk_utils
+%INCLUDE mappdk_comm
+%INCLUDE mappdk_cmd
+
+BEGIN -- Begin main program
+    -- clear screen
+    WRITE('MAPPDK LOGGER started.', CR)
+    
+    WHILE TRUE DO
+        -- open
+        OPEN_COMM(comm_file, SERVER_TAG_NUM, PORT_NUMBER)
+
+        keep_conn = TRUE
+        WHILE keep_conn DO
+            READ comm_file(cmd)
+            IF UNINIT(cmd) THEN
+                keep_conn = FALSE
+            ELSE
+                keep_conn = HANDLE_CMD(cmd, resp)
+
+                IF keep_conn THEN
+                    WRITE comm_file (resp)
+                ELSE
+                    WRITE comm_file (resp)
+                    READ comm_file(cmd::0)
+                ENDIF
+            ENDIF
+        ENDWHILE
+        
+        -- disconnect
+        CLOSE_COMM(comm_file, SERVER_TAG_NUM)
+    ENDWHILE -- main listening loop
+
+    WRITE('MAPPDK LOGGER finished.', CR)
+END MAPPDK_LOGGER

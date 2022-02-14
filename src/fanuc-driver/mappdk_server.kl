@@ -1,0 +1,81 @@
+----------------------------------------------------
+-- Author:              Agajan Torayev
+-- Email:               torayeff@gmail.com
+-- Homepage:            https://torayeff.com
+-- Copyright:           Agajan Torayev
+-- Description:         Manufacturing Apps
+--                      Development Kit (MAPPDK) 
+--                      Driver for FANUC robots.
+----------------------------------------------------
+PROGRAM MAPPDK_SERVER
+%STACKSIZE = 4000
+%NOLOCKGROUP
+%NOPAUSE = ERROR + COMMAND + TPENABLE
+%ALPHABETIZE
+%COMMENT = 'MAPPDK SERVER V0.0.1'
+
+VAR
+    comm_file:          FILE
+    status:             INTEGER
+    entry:              INTEGER
+    cmd:                STRING[254]
+    resp:               STRING[254]
+    keep_conn:          BOOLEAN
+    uframe_str:         STRING[1]
+    tool_str:           STRING[1]
+    
+CONST
+    SERVER_TAG_NUM = 8
+    PORT_NUMBER = 18735
+    UFRAMENUM = 8
+    TOOLNUM = 8
+
+
+-- Include routines
+%INCLUDE mappdk_utils
+%INCLUDE mappdk_comm
+%INCLUDE mappdk_cmd
+
+BEGIN -- Begin main program
+    -- clear screen
+    TP_CLS
+    WRITE('MAPPDK SERVER started.', CR)
+
+    -- set userframe and toolframe
+    -- !!!TO BE DOCUMENTED!!!
+    SET_VAR(entry, '*SYSTEM*', '$MNUFRAMENUM[1]', UFRAMENUM, status)
+    SET_VAR(entry, '*SYSTEM*', '$MNUTOOLNUM[1]', TOOLNUM, status)
+
+    -- update $UFRAME and $UTOOL
+    CNV_INT_STR(UFRAMENUM, 1, 0, uframe_str)
+    CNV_INT_STR(TOOLNUM, 1, 0, tool_str)
+    GET_VAR(entry, '*SYSTEM*', '$MNUFRAME[1, ' + uframe_str + ']', $GROUP[1].$UFRAME, status)
+    GET_VAR(entry, '*SYSTEM*', '$MNUTOOL[1, ' + tool_str + ']', $GROUP[1].$UTOOL, status)
+    
+    WHILE TRUE DO
+        -- open
+        OPEN_COMM(comm_file, SERVER_TAG_NUM, PORT_NUMBER)
+        
+        keep_conn = TRUE
+        WHILE keep_conn DO
+            READ comm_file(cmd)
+            IF UNINIT(cmd) THEN
+                keep_conn = FALSE
+            ELSE
+                keep_conn = HANDLE_CMD(cmd, resp)
+
+                IF keep_conn THEN
+                    WRITE comm_file (resp)
+                ELSE
+                    WRITE comm_file (resp)
+                    READ comm_file(cmd::0)
+                ENDIF
+            ENDIF
+        ENDWHILE
+        
+        -- disconnect
+        CLOSE_COMM(comm_file, SERVER_TAG_NUM)
+    ENDWHILE -- main listening loop
+
+    WRITE('MAPPDK SERVER finished.', CR)
+END MAPPDK_SERVER

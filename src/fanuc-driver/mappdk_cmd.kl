@@ -1,0 +1,509 @@
+----------------------------------------------------
+-- Author:              Agajan Torayev
+-- Email:               torayeff@gmail.com
+-- Homepage:            https://torayeff.com
+-- Copyright:           Agajan Torayev
+-- Description:         Handles commands sent from
+--                      external program.
+----------------------------------------------------
+
+ROUTINE GET_CURPOS(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Get current cartesian position of TCP.
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    resp:           STRING[254]
+    out:            STRING[254]
+    cpos:           XYZWPR
+BEGIN
+    cpos = CURPOS(0, 0)
+    
+    CNV_REAL_STR(cpos.x, 8, 3, out)
+    resp = '0:x=' + out
+
+    CNV_REAL_STR(cpos.y, 8, 3, out)
+    resp = resp + ',y=' + out
+
+    CNV_REAL_STR(cpos.z, 8, 3, out)
+    resp = resp + ',z=' + out
+
+    CNV_REAL_STR(cpos.w, 8, 3, out)
+    resp = resp + ',w=' + out
+
+    CNV_REAL_STR(cpos.p, 8, 3, out)
+    resp = resp + ',p=' + out
+
+    CNV_REAL_STR(cpos.r, 8, 3, out)
+    resp = resp + ',r=' + out
+    
+    RETURN(resp)
+END GET_CURPOS
+
+
+ROUTINE GET_CURJPOS(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Get current joint position of the TCP.
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    resp:           STRING[254]
+    out:            STRING[254]
+    jpos:           JOINTPOS
+    joint_vals:     ARRAY[9] OF REAL
+    status:         INTEGER
+    i:              INTEGER
+    
+BEGIN
+    jpos = CURJPOS(0, 0)
+    
+    CNV_JPOS_REL(jpos, joint_vals, status)
+    IF status <> 0 THEN
+        resp = '1:cannot-convert-joint-vals'
+        RETURN(resp)
+    ENDIF
+    
+    resp = '0:'
+    FOR i=1 TO ARRAY_LEN(joint_vals) DO
+        IF UNINIT(joint_vals[i]) THEN
+            out='none'
+        ELSE
+            CNV_REAL_STR(joint_vals[i], 8, 3, out)
+        ENDIF
+        IF i=1 THEN
+            resp = resp + 'j=' + out
+        ELSE
+            resp = resp + ',j=' + out
+        ENDIF
+        
+    ENDFOR
+    
+    RETURN(resp)
+END GET_CURJPOS
+
+
+ROUTINE GET_INS_PWR(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Get instantaneous power consumption.
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    resp:           STRING[254]
+    status:         INTEGER
+    ins_pwr:        REAL
+    
+BEGIN
+    GET_VAR(entry, '*SYSTEM*', '$PRO_CFG.$INS_PWR', ins_pwr, status)
+    
+    IF status <> 0 THEN
+        resp = '1:cannot-get-ins_pwr'
+        RETURN(resp)
+    ENDIF
+
+    CNV_REAL_STR(ins_pwr, 6, 6, resp)
+    resp = '0:' + resp
+    
+    RETURN(resp)
+END GET_INS_PWR
+
+
+ROUTINE MOVEJ(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Moves joints.
+-- cmd string should follow the below format:
+-- movej:vel_val:cnt_val:nj:J1:J2:J3:J4:J5:J6
+-- where:
+-- vel_val: abc (3 digits), e.g.: 002, 020, 100
+-- cnt_val: abc (3 digits), e.g.: 003, 030, 100
+-- nj: n (1 digit), e.g.: 6, 7
+-- J1: (18 chars), e.g.: +1234567890.09876543216
+-- J2 ... Jn are similar to J1
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    status:             INTEGER
+    vel_val:            INTEGER
+    acc_val:            INTEGER
+    cnt_val:            INTEGER
+    mtn_type:           INTEGER
+    nj:                 INTEGER
+    i:                  INTEGER
+    joint_vals:         ARRAY[9] OF REAL
+    jval:               REAL
+    jpos:               JOINTPOS6
+    out_pos:            POSITION
+    ext_ang:            ARRAY[6] OF REAL
+    wjnt_cfg:           CONFIG
+    start:              INTEGER
+    prog_index:         INTEGER
+    resp:               STRING[254]
+
+CONST    
+    n_chars = 18
+BEGIN
+    start = 7
+
+    -- Get vel_val put it to R[81]
+    CNV_STR_INT(SUB_STR(cmd, start, 4), vel_val)
+    SET_INT_REG(81, vel_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[81]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 4 + 1
+
+    -- Get acc_val and put it to R[82]
+    CNV_STR_INT(SUB_STR(cmd, start, 4), acc_val)
+    SET_INT_REG(82, acc_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[82]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 4 + 1
+
+    -- Get CNT value and put it to R[83]
+    CNV_STR_INT(SUB_STR(cmd, start, 3), cnt_val)
+    SET_INT_REG(83, cnt_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[83]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 3 + 1
+
+    -- Get the motion type
+    CNV_STR_INT(SUB_STR(cmd, start, 1), mtn_type)
+    start = start + 1 + 1
+
+    -- Get the number of joints of robot
+    CNV_STR_INT(SUB_STR(cmd, start, 1), nj)
+    start = start + 1 + 1
+    
+    -- Read joint values from the cmd string
+    -- and convert the joint values to JOINTPOS6
+    FOR i=1 TO nj DO
+        CNV_STR_REAL(SUB_STR(cmd, start, n_chars), jval)
+        joint_vals[i] = jval
+        start = start + n_chars + 1
+    ENDFOR
+    CNV_REL_JPOS(joint_vals, jpos, status)
+    IF status <> 0 THEN
+        resp = '1:error-in-joint-values'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+
+    -- Convert joint angles to a cartesian position
+    -- by calling the forward kinematics
+    -- and check the reachability
+    out_pos = CURPOS(0, 0)
+    JOINT2POS(jpos, $UFRAME, $UTOOL, 0,
+              out_pos, wjnt_cfg, ext_ang, status)
+    IF status <> 0 THEN
+        resp = '1:position-is-not-reachable'
+        RETURN(resp)
+    ENDIF
+
+    -- Put joint positions to PR[81]
+    SET_JPOS_REG(81, jpos, status)
+    IF status <> 0 THEN
+        resp = '1:PR[81]-was-not-set'
+        RETURN(resp)
+    ENDIF
+
+    IF mtn_type = 1 THEN
+        -- linear movement
+        CALL_PROGLIN('MAPPDK_MOVEL', 1, prog_index, FALSE)
+    ELSE
+        -- joint movement
+        CALL_PROGLIN('MAPPDK_MOVE', 1, prog_index, FALSE)
+    ENDIF
+
+    resp = '0:success'
+    RETURN(resp)
+
+END MOVEJ
+
+
+ROUTINE MOVEP(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Moves to pose.
+-- cmd string should follow the below format:
+-- movep:vel_val:cnt_val:nj:X:Y:Z:W:P:R
+-- where:
+-- vel_val: abc (3 digits), e.g.: 002, 020, 100
+-- cnt_val: abc (3 digits), e.g.: 003, 030, 100
+-- nj: n (1 digit), nj = 6
+-- X: (18 chars), e.g.: +1234567890.0987654321
+-- Y, Z, W, P, R are similar to J1
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    status:             INTEGER
+    vel_val:            INTEGER
+    acc_val:            INTEGER
+    cnt_val:            INTEGER
+    mtn_type:           INTEGER
+    nj:                 INTEGER
+    i:                  INTEGER
+    pose:               XYZWPR
+    pval:               REAL
+    start:              INTEGER
+    prog_index:         INTEGER
+    resp:               STRING[254]
+
+CONST
+    n_chars = 18
+BEGIN
+    start = 7
+
+    -- Get vel_val put it to R[81]
+    CNV_STR_INT(SUB_STR(cmd, start, 4), vel_val)
+    SET_INT_REG(81, vel_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[81]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 4 + 1
+
+    -- Get acc_val and put it to R[82]
+    CNV_STR_INT(SUB_STR(cmd, start, 4), acc_val)
+    SET_INT_REG(82, acc_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[82]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 4 + 1
+
+    -- Get CNT value and put it to R[83]
+    CNV_STR_INT(SUB_STR(cmd, start, 3), cnt_val)
+    SET_INT_REG(83, cnt_val, status)
+    IF status <> 0 THEN
+        resp = '1:R[83]-was-not-set'
+        WRITE('Error: ', status, CR)
+        RETURN(resp)
+    ENDIF
+    start = start + 3 + 1
+
+    -- Get the motion type
+    CNV_STR_INT(SUB_STR(cmd, start, 1), mtn_type)
+    start = start + 1 + 1
+
+    -- Get the number of joints of robot
+    CNV_STR_INT(SUB_STR(cmd, start, 1), nj)
+    start = start + 1 + 1
+    
+    -- Read pose values from the cmd string
+    pose = CURPOS(0, 0)
+    FOR i=1 TO nj DO
+        CNV_STR_REAL(SUB_STR(cmd, start, n_chars), pval)
+
+        IF i=1 THEN
+            pose.x = pval
+        ENDIF
+
+        IF i=2 THEN
+            pose.y = pval
+        ENDIF
+
+        IF i=3 THEN
+            pose.z = pval
+        ENDIF
+
+        IF i=4 THEN
+            pose.w = pval
+        ENDIF
+
+        IF i=5 THEN
+            pose.p = pval
+        ENDIF
+
+        IF i=6 THEN
+            pose.r = pval
+        ENDIF
+
+        start = start + n_chars + 1
+    ENDFOR
+    
+    CHECK_EPOS ((pose), $UFRAME, $UTOOL, status)
+    IF status <> 0 THEN
+        resp = '1:position-is-not-reachable'
+        RETURN(resp)
+    ENDIF
+
+    -- Put position to PR[81]
+    SET_POS_REG(81, pose, status)
+    IF status <> 0 THEN
+        resp = '1:PR[81]-was-not-set'
+        RETURN(resp)
+    ENDIF
+
+    IF mtn_type = 1 THEN
+        -- linear movement
+        CALL_PROGLIN('MAPPDK_MOVEL', 1, prog_index, FALSE)
+    ELSE
+        -- joint movement
+        CALL_PROGLIN('MAPPDK_MOVE', 1, prog_index, FALSE)
+    ENDIF
+
+    resp = '0:success'
+    RETURN(resp)
+
+END MOVEP
+
+
+
+ROUTINE MAPPDKCALL(cmd: STRING) : STRING
+----------------------------------------------------
+-- Function: Calls external program.
+-- cmd string should follow the below format:
+-- 'mappdkcall:PROGNAME'
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    resp:           STRING[254]
+    prg_name:       STRING[32]
+    prog_index:     INTEGER
+BEGIN
+    -- Get prog name from 'mappdkcall:PROG_NAME'
+    prg_name = SUB_STR(cmd, 12, STR_LEN(cmd) - 11)
+    CALL_PROGLIN(prg_name, 1, prog_index, FALSE)
+    
+    resp = '0:success'
+    RETURN(resp)
+END MAPPDKCALL
+
+
+ROUTINE SET_RDO(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Sets robot digital out.
+-- cmd string should follow the below format:
+-- 'setrdo:n:value'
+-- n: a single digit number
+-- value: 'true' or 'false' (lowercase)
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    rdo_num:            INTEGER
+    rdo_val:            STRING[8]
+BEGIN
+    -- Get RDO number
+    CNV_STR_INT(SUB_STR(cmd, 8, 1), rdo_num)
+
+    -- Get RDO value
+    rdo_val = SUB_STR(cmd, 10, STR_LEN(cmd) - 9)
+    
+    IF rdo_val = 'true' THEN
+        RDO[rdo_num] = TRUE
+        resp = '0:success'
+        RETURN(resp)
+    ENDIF
+
+    IF rdo_val = 'false' THEN
+        RDO[rdo_num] = FALSE
+        resp = '0:success'
+        RETURN(resp)
+    ENDIF
+
+    resp = '1:wrong-rdo-value'
+    RETURN(resp)
+
+END SET_RDO
+
+
+ROUTINE HANDLE_CMD(cmd: STRING; 
+                   resp: STRING) : BOOLEAN
+----------------------------------------------------
+-- Function: Handles commands.
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+--      resp [IN, OUT]:     response string.
+----------------------------------------------------
+-- Return value: BOOLEAN keep or close connection.
+----------------------------------------------------
+BEGIN
+    IF cmd = 'exit' THEN
+        resp = '0:success'
+        RETURN(FALSE)
+    ENDIF
+
+    -- curpos
+    IF SUB_STR(cmd, 1, 6) = 'curpos' THEN
+        resp = GET_CURPOS(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- curjpos
+    IF SUB_STR(cmd, 1, 7) = 'curjpos' THEN
+        resp = GET_CURJPOS(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- ins_pwr
+    IF SUB_STR(cmd, 1, 7) = 'ins_pwr' THEN
+        resp = GET_INS_PWR(cmd)
+        RETURN(TRUE)
+    ENDIF
+    
+    -- movej
+    IF SUB_STR(cmd, 1, 5) = 'movej' THEN
+        resp = MOVEJ(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- movep
+    IF SUB_STR(cmd, 1, 5) = 'movep' THEN
+        resp = MOVEP(cmd)
+        RETURN(TRUE)
+    ENDIF
+    
+    -- mappdkcall: call external TP program
+    IF SUB_STR(cmd, 1, 10) = 'mappdkcall' THEN
+        resp = MAPPDKCALL(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- setrdo: set Robot Digital Output
+    IF SUB_STR(cmd, 1, 6) = 'setrdo' THEN
+        resp = SET_RDO(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- if none of the above cmds matched
+    WRITE('WRONG COMMAND: ', cmd, CR)
+    resp = '1:wrong-command'
+    RETURN(TRUE)
+END HANDLE_CMD

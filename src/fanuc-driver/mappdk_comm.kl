@@ -1,0 +1,82 @@
+----------------------------------------------------
+-- Author:              Agajan Torayev
+-- Email:               torayeff@gmail.com
+-- Homepage:            https://torayeff.com
+-- Copyright:           Agajan Torayev
+-- Description:         MAPPDK socket communication
+--                      functions.
+----------------------------------------------------
+
+
+ROUTINE OPEN_COMM(comm_file: FILE;
+                  server_num: INTEGER;
+                  port_number: INTEGER)
+----------------------------------------------------
+-- Function: Opens socket communicatons on 'S8:'.
+----------------------------------------------------
+-- Arguments: 
+--          comm_file:      communication file.
+--          server_num:     server tag number.
+--          port_number:    port number.
+----------------------------------------------------
+-- Return value: none.
+----------------------------------------------------
+VAR
+    entry:              INTEGER
+    status:             INTEGER
+    resp:               STRING[254]
+    server_str:         STRING[2]
+    server_tag:         STRING[4]
+BEGIN
+    -- make server tag
+    CNV_INT_STR(server_num, 1, 0, server_str)
+    server_str = SUB_STR(server_str, 2, 1) -- this is weird
+    server_tag = 'S' + server_str + ':'
+
+    -- set the server port number
+    -- !!!TO BE DOCUMENTED!!!
+    SET_VAR(entry,
+            '*SYSTEM*',
+            '$HOSTC_CFG[' + server_str + '].$SERVER_PORT', 
+            port_number, status)
+        
+    -- set up server
+    MSG_DISCO(server_tag, status)
+    CLOSE FILE comm_file
+
+    -- start socket connection
+    SET_FILE_ATR(comm_file, ATR_IA)
+    MSG_CONNECT(server_tag, status)
+
+    OPEN FILE comm_file ('rw', server_tag)
+
+    -- send first response to the client
+    resp = '0:success'
+    WRITE comm_file (resp)
+END OPEN_COMM
+
+
+ROUTINE CLOSE_COMM(comm_file: FILE; server_num: INTEGER)
+----------------------------------------------------
+-- Function: Closes socket communicatons on 'S8:'.
+----------------------------------------------------
+-- Arguments: 
+--          comm_file: communication file.
+--          server_num:     server tag number.
+----------------------------------------------------
+-- Return value: none.
+----------------------------------------------------
+VAR
+    status:             INTEGER
+    server_str:         STRING[2]
+    server_tag:         STRING[4]
+BEGIN
+    -- make server tag
+    CNV_INT_STR(server_num, 1, 0, server_str)
+    server_str = SUB_STR(server_str, 2, 1) -- this is weird
+    server_tag = 'S' + server_str + ':'
+
+    -- disconnect
+    CLOSE FILE comm_file
+    MSG_DISCO(server_tag, status)
+END CLOSE_COMM
