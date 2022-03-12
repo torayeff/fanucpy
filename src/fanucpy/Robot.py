@@ -39,7 +39,7 @@ class Robot(ABC):
         self.ERROR_CODE = 1
     
     def __version__(self):
-        print("MAPPDK Robot class v0.01")
+        print("MAPPDK Robot class v0.1.1")
 
     def handle_response(self, resp, verbose=False):
         """Handles response from socket communication.

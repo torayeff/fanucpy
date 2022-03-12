@@ -1,4 +1,4 @@
-from Robot import Robot
+from fanucpy import Robot
 
 robot = Robot(
     robot_model="Fanuc",

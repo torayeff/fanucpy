@@ -11,15 +11,20 @@ The package consists of two parts:
 2. FANUC robot controller driver (tested with R-30iB Mate Plus Controller) written in KAREL and FANUC teach pendant languages
 
 The communication protocol between the Python package and the FANUC robot controller is depicted below:
-![Communication Protocol](media/CommProtocol.png)
+![Communication Protocol](https://github.com/torayeff/fanucpy/raw/main/media/CommProtocol.png)
+
+## Python package installation
+```bash
+pip install fanucpy
+```
 
 ## Driver installation
-Follow these [steps](fanuc.md) to install FANUC driver.
+Follow these [steps](https://raw.githubusercontent.com/torayeff/fanucpy/main/fanuc.md) to install FANUC driver.
 
 ## Usage
 ### Connect to a robot:
 ```python
-from Robot import Robot
+from fanucpy import Robot
 
 robot = Robot(
     robot_model="Fanuc",
