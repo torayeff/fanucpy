@@ -19,7 +19,7 @@ pip install fanucpy
 ```
 
 ## Driver installation
-Follow these [steps](https://raw.githubusercontent.com/torayeff/fanucpy/main/fanuc.md) to install FANUC driver.
+Follow these [steps](https://github.com/torayeff/fanucpy/blob/main/fanuc.md) to install FANUC driver.
 
 ## Usage
 ### Connect to a robot:
