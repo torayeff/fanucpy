@@ -1,11 +1,11 @@
 [tool.poetry]
 name = "fanucpy"
-version = "0.1.2"
+version = "0.1.3"
 description = "Python package for FANUC industrial robots"
 authors = ["Agajan Torayev <torayeff@gmail.com>"]
 repository = "https://github.com/torayeff/fanucpy"
 readme = 'README.md'
-keywords = ["fanuc", "industrial robot"]
+keywords = ["fanuc", "industrial robot", "robotic apps"]
 license = "Apache License 2.0"
 
 [tool.poetry.dependencies]
