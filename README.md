@@ -76,3 +76,10 @@ print(f"Current pose: {robot.get_curpos()}")
 print(f"Current joints: {robot.get_curjpos()}")
 print(f"Instantaneous power: {robot.get_ins_power()}")
 ```
+
+
+## RobotApp
+We introduce an experimental feature: Robot Apps. This class facilitates modularity and plug-and-produce functionality. Check the following example apps:
+
+1. [Pick and Place App](examples/PickAndPlaceApp.py)
+1. [Aruco Tracking App](examples/ArucoTrackingApp.py)

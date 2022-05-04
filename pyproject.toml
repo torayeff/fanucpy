@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "fanucpy"
-version = "0.1.4"
+version = "0.1.5"
 description = "Python package for FANUC industrial robots"
 authors = ["Agajan Torayev <torayeff@gmail.com>"]
 repository = "https://github.com/torayeff/fanucpy"
