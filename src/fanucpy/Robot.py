@@ -2,6 +2,8 @@ from abc import ABC
 import socket
 import sys
 
+from sqlalchemy import true
+
 
 class Robot(ABC):
     def __init__(
@@ -37,7 +39,7 @@ class Robot(ABC):
         self.comm_sock = None
         self.SUCCESS_CODE = 0
         self.ERROR_CODE = 1
-    
+
     def __version__(self):
         print("MAPPDK Robot class v0.1.1")
 
@@ -73,7 +75,7 @@ class Robot(ABC):
         self.comm_sock.connect((self.host, self.port))
         resp = self.comm_sock.recv(self.sock_buff_sz).decode()
         _, _ = self.handle_response(resp, verbose=True)
-    
+
     def disconnect(self) -> None:
         self.comm_sock.close()
 
@@ -104,7 +106,7 @@ class Robot(ABC):
         """
         cmd = f"mappdkcall:{prog_name}"
         self.send_cmd(cmd)
-    
+
     def get_ins_power(self) -> float:
         """Gets instantaneous power consumption.
 
@@ -117,7 +119,7 @@ class Robot(ABC):
 
         # Fanuc returns in kW. Should be adjusted to other robots.
         ins_pwr = float(msg) * 1000
-        
+
         return ins_pwr
 
     def get_curpos(self):
@@ -143,7 +145,9 @@ class Robot(ABC):
         vals = [float(val.split("=")[1]) for val in msg.split(",") if val != "j=none"]
         return vals
 
-    def move(self, move_type, vals, velocity=25, acceleration=100, cnt_val=0, linear=False) -> None:
+    def move(
+        self, move_type, vals, velocity=25, acceleration=100, cnt_val=0, linear=False
+    ) -> None:
         """[summary]
 
         Args:
@@ -222,3 +226,30 @@ class Robot(ABC):
             self.send_cmd(cmd)
         else:
             raise ValueError("DO type or number is None!")
+
+    def get_rdo(self, rdo_num):
+        """Get RDO value.
+
+        Args:
+            rdo_num (int): RDO number.
+        
+        Returns:
+            rdo_value: RDO value.
+        """
+        cmd = f"getrdo:{rdo_num}"
+        _, rdo_value = self.send_cmd(cmd)
+        rdo_value = int(rdo_value)
+        return rdo_value
+
+
+if __name__ == "__main__":
+    robot = Robot(
+        robot_model="Fanuc",
+        host="127.0.0.1",
+        port=18735,
+        ee_DO_type="RDO",
+        ee_DO_num=7,
+    )
+
+    robot.connect()
+    r = robot.get_rdo(7)

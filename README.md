@@ -75,6 +75,7 @@ robot.gripper(False)
 print(f"Current pose: {robot.get_curpos()}")
 print(f"Current joints: {robot.get_curjpos()}")
 print(f"Instantaneous power: {robot.get_ins_power()}")
+print(f"Get gripper state: {robot.get_rdo(7)}")
 ```
 
 
