@@ -2,8 +2,6 @@ from abc import ABC
 import socket
 import sys
 
-from sqlalchemy import true
-
 
 class Robot(ABC):
     def __init__(
