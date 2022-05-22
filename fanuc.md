@@ -30,8 +30,10 @@ Set up the ethernet connection with host and robot controller, then follow the b
 ![3](https://user-images.githubusercontent.com/67538561/169283076-5172b547-660e-42f0-9447-cb79ed5f114f.png)
 
 2. Go to **TCP/IP**
-  real robot:
+ 
+ real robot:
   - Set the **Robot name**, the **IP addr** to **192.168.234.2** or IP in the same subnet as the host computer. This is the IP address of the robot controller.
+  
   roboguide: 
   - The IP address is **127.0.0.1** by default
 4. Set the **Subnet Mask** to **255.255.255.0**.
