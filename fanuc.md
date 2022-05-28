@@ -52,8 +52,8 @@ The FANUC MAPPDK server by default uses server tag **'S8:'** and port **18735**.
     * 1.2. Press enter to select the number **8**.
     *
     * 1.3. Once you enter into a new place, set the variable **$SERVER_PORT** to **18735**.
-    ![image](https://user-images.githubusercontent.com/67538561/169285678-88508464-2651-4f4c-8c15-52c67ccf9747.png)
-
+    ![image](https://user-images.githubusercontent.com/67538561/170824186-b1f0c04b-7533-4656-8688-ada5eda75f1f.png)   
+    
 2. Go to **MENU** -> **SETUP** -> **Host Comm**.
     * 2.1. Select **SHOW** -> **Servers**.
     * 2.2. Select **S8**.
