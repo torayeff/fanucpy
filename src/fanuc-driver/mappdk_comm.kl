@@ -37,7 +37,7 @@ BEGIN
     -- !!!TO BE DOCUMENTED!!!
     SET_VAR(entry,
             '*SYSTEM*',
-            '$HOSTC_CFG[' + server_str + '].$SERVER_PORT', 
+            '$HOSTS_CFG[' + server_str + '].$SERVER_PORT', 
             port_number, status)
         
     -- set up server
