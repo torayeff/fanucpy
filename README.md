@@ -84,3 +84,6 @@ We introduce an experimental feature: Robot Apps. This class facilitates modular
 
 1. [Pick and Place App](examples/PickAndPlaceApp.py)
 1. [Aruco Tracking App](examples/ArucoTrackingApp.py)
+
+## Technical Support
+We provide [a technical support](https://www.torayeff.com/) for FANUC robots.
