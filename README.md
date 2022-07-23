@@ -85,5 +85,16 @@ We introduce an experimental feature: Robot Apps. This class facilitates modular
 1. [Pick and Place App](examples/PickAndPlaceApp.py)
 1. [Aruco Tracking App](examples/ArucoTrackingApp.py)
 
-## Technical Support
-We provide [a technical support](https://www.torayeff.com/) for FANUC robots.
+## Citation
+Please use the following to cite if you are using this library in academic publications [Towards Modular and Plug-and-Produce Manufacturing Apps](https://www.sciencedirect.com/science/article/pii/S2212827122004255)
+```
+@article{torayev2022towards,
+  title={Towards Modular and Plug-and-Produce Manufacturing Apps},
+  author={Torayev, Agajan and Mart{\'\i}nez-Arellano, Giovanna and Chaplin, Jack C and Sanderson, David and Ratchev, Svetan},
+  journal={Procedia CIRP},
+  volume={107},
+  pages={1257--1262},
+  year={2022},
+  publisher={Elsevier}
+}
+```
