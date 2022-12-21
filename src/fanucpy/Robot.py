@@ -22,7 +22,8 @@ class Robot(ABC):
             ee_DO_type (str, optional): End-effector digital output type.
                                         Fanuc used RDO type. Defaults to None.
                                         Others may use DO type.
-            ee_DO_num (int, optional): End-effector digital output number. Defaults to None.
+            ee_DO_num (int, optional): End-effector digital output number.
+                                       Defaults to None.
             socket_timeout(int): Socket timeout in seconds. Defaults to 5 seconds.
         """
         super().__init__()
