@@ -4,13 +4,13 @@ import numpy as np
 import os
 
 
-def save_calib_data(calib_data, calib_data_path):
+def save_calib_data(calib_data: object, calib_data_path: str):
     """Saves calibration data."""
     with open(calib_data_path, "wb") as f:
         pickle.dump(calib_data, f)
 
 
-def load_calib_data(calib_data_path):
+def load_calib_data(calib_data_path: str):
     """Loads calibration data."""
     with open(calib_data_path, "rb") as f:
         calib_data = pickle.load(f)
@@ -21,9 +21,27 @@ def draw_axis(img, corners, imgpts, thickness=5):
     """Draws xyz axis."""
     # NOTE: opencv in BGR order, B-z, G-y, R-x
     corner = tuple(corners[0].astype(int).ravel())
-    img = cv2.line(img, corner, tuple(imgpts[0].astype(int).ravel()), (0, 0, 255), thickness=thickness)
-    img = cv2.line(img, corner, tuple(imgpts[1].astype(int).ravel()), (0, 255, 0), thickness=thickness)
-    img = cv2.line(img, corner, tuple(imgpts[2].astype(int).ravel()), (255, 0, 0), thickness=thickness)
+    img = cv2.line(
+        img,
+        corner,
+        tuple(imgpts[0].astype(int).ravel()),
+        (0, 0, 255),
+        thickness=thickness,
+    )
+    img = cv2.line(
+        img,
+        corner,
+        tuple(imgpts[1].astype(int).ravel()),
+        (0, 255, 0),
+        thickness=thickness,
+    )
+    img = cv2.line(
+        img,
+        corner,
+        tuple(imgpts[2].astype(int).ravel()),
+        (255, 0, 0),
+        thickness=thickness,
+    )
     return img
 
 
@@ -67,7 +85,7 @@ def calibrate_camera_checkerboard(images, cols, rows, square_size, verbose=True)
 
         ret, corners = cv2.findChessboardCorners(gray, (cols, rows), None)
 
-        if ret == True:
+        if ret:
             objpoints.append(objp)
 
             corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
@@ -140,7 +158,7 @@ def find_checkerboard_pose(frame, camera_matrix, dist_coeffs, cols, rows, square
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
 
     ret, corners = cv2.findChessboardCorners(gray, (cols, rows), None)
-    
+
     if ret == True:
         # refine corners
         corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
