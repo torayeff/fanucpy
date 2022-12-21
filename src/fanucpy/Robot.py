@@ -6,12 +6,12 @@ import sys
 class Robot(ABC):
     def __init__(
         self,
-        robot_model,
-        host,
-        port=18375,
-        ee_DO_type=None,
-        ee_DO_num=None,
-        socket_timeout=60,
+        robot_model: str,
+        host: str,
+        port: int = 18375,
+        ee_DO_type: str = None,
+        ee_DO_num: int = None,
+        socket_timeout: int = 60,
     ):
         """[summary]
 
@@ -41,7 +41,7 @@ class Robot(ABC):
     def __version__(self):
         print("MAPPDK Robot class v0.1.1")
 
-    def handle_response(self, resp, verbose=False):
+    def handle_response(self, resp: str, verbose: bool = False):
         """Handles response from socket communication.
 
         Args:
@@ -77,7 +77,7 @@ class Robot(ABC):
     def disconnect(self) -> None:
         self.comm_sock.close()
 
-    def send_cmd(self, cmd):
+    def send_cmd(self, cmd: str):
         """Sends command to a physical robot.
 
         Args:
@@ -96,7 +96,7 @@ class Robot(ABC):
         resp = self.comm_sock.recv(self.sock_buff_sz).decode()
         return self.handle_response(resp)
 
-    def call_prog(self, prog_name) -> None:
+    def call_prog(self, prog_name: str) -> None:
         """Calls external program name in a physical robot.
 
         Args:
@@ -144,9 +144,15 @@ class Robot(ABC):
         return vals
 
     def move(
-        self, move_type, vals, velocity=25, acceleration=100, cnt_val=0, linear=False
+        self,
+        move_type: str,
+        vals: list,
+        velocity: int = 25,
+        acceleration: int = 100,
+        cnt_val: int = 0,
+        linear: bool = False,
     ) -> None:
-        """[summary]
+        """Moves robot.
 
         Args:
             move_type (str): Movement type (joint or pose).
@@ -202,11 +208,10 @@ class Robot(ABC):
         # call send_cmd
         self.send_cmd(cmd)
 
-    def gripper(self, value) -> None:
+    def gripper(self, value: bool) -> None:
         """Opens/closes robot gripper.
 
         Args:
-            out_num (int): RDO or DO number.
             value (boolean): True or False
         """
         if (self.ee_DO_type is not None) and (self.ee_DO_num is not None):
@@ -225,12 +230,12 @@ class Robot(ABC):
         else:
             raise ValueError("DO type or number is None!")
 
-    def get_rdo(self, rdo_num):
+    def get_rdo(self, rdo_num: int):
         """Get RDO value.
 
         Args:
             rdo_num (int): RDO number.
-        
+
         Returns:
             rdo_value: RDO value.
         """
@@ -238,16 +243,3 @@ class Robot(ABC):
         _, rdo_value = self.send_cmd(cmd)
         rdo_value = int(rdo_value)
         return rdo_value
-
-
-if __name__ == "__main__":
-    robot = Robot(
-        robot_model="Fanuc",
-        host="127.0.0.1",
-        port=18735,
-        ee_DO_type="RDO",
-        ee_DO_num=7,
-    )
-
-    robot.connect()
-    r = robot.get_rdo(7)
