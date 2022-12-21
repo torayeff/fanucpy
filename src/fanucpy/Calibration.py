@@ -159,7 +159,7 @@ def find_checkerboard_pose(frame, camera_matrix, dist_coeffs, cols, rows, square
 
     ret, corners = cv2.findChessboardCorners(gray, (cols, rows), None)
 
-    if ret == True:
+    if ret:
         # refine corners
         corners = cv2.cornerSubPix(gray, corners, (11, 11), (-1, -1), criteria)
 
