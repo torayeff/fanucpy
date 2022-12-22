@@ -78,6 +78,17 @@ print(f"Instantaneous power: {robot.get_ins_power()}")
 print(f"Get gripper state: {robot.get_rdo(7)}")
 ```
 
+### Calling external program
+```python
+robot.call_prog(prog_name)
+```
+
+### Get/Set RDO
+```python
+robot.get_rdo(rdo_num=7)
+robot.set_rdo(rdo_num=7, value=True)
+```
+
 
 ## RobotApp
 We introduce an experimental feature: Robot Apps. This class facilitates modularity and plug-and-produce functionality. Check the following example apps:
