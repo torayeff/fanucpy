@@ -244,3 +244,20 @@ class Robot(ABC):
         _, rdo_value = self.send_cmd(cmd)
         rdo_value = int(rdo_value)
         return rdo_value
+
+    def set_rdo(self, rdo_num: int, val: bool):
+        """Sets RDO value.
+
+        Args:
+            rdo_num (int): RDO number.
+            val (bool): Value.
+
+        Returns:
+            rdo_value: RDO value.
+        """
+        if val:
+            val = "true"
+        else:
+            val = "false"
+        cmd = f"setrdo:{rdo_num}:{val}"
+        self.send_cmd(cmd)
