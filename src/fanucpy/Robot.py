@@ -251,13 +251,24 @@ class Robot(ABC):
         Args:
             rdo_num (int): RDO number.
             val (bool): Value.
-
-        Returns:
-            rdo_value: RDO value.
         """
         if val:
             val = "true"
         else:
             val = "false"
         cmd = f"setrdo:{rdo_num}:{val}"
+        self.send_cmd(cmd)
+
+    def set_sys_var(self, sys_var: str, val: bool):
+        """Sets system variable to True or False.
+
+        Args:
+            sys_var (str): System variable name.
+            val (bool): Value.
+        """
+        if val:
+            val = "T"
+        else:
+            val = "F"
+        cmd = f"setsysvar:{sys_var}:{val}"
         self.send_cmd(cmd)

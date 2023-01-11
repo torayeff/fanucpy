@@ -478,6 +478,47 @@ BEGIN
 
 END SET_RDO
 
+ROUTINE SET_SYS_VAR(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Sets System Variable.
+-- cmd string should follow the below format:
+-- 'setsysvar:n:value'
+-- n: a string of the system variable to change
+-- value: 'T' or 'F' (T/F)
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+	resp:           	STRING[254]
+	sys_var:            STRING[254]
+	sys_val:            STRING[8]
+BEGIN
+	-- Get System Variable string
+	sys_var = SUB_STR(cmd, 11, (STR_LEN(cmd) - 12))
+
+	-- Get System Variable value
+	sys_val = SUB_STR(cmd, 10 + STR_LEN(sys_var) + 2, 1)
+	
+	IF sys_val = 'T' THEN
+		SET_VAR(entry, '*SYSTEM*', sys_var, TRUE, status)
+		resp = '0:success'
+		RETURN(resp)
+	ENDIF
+
+	IF sys_val = 'F' THEN
+		SET_VAR(entry, '*SYSTEM*', sys_var, FALSE, status)
+		resp = '0:success'
+		RETURN(resp)
+	ENDIF
+
+	resp = '1:wrong-sys_var-value'
+	RETURN(resp)
+
+END SET_SYS_VAR
+
 
 ROUTINE HANDLE_CMD(cmd: STRING; 
                    resp: STRING) : BOOLEAN
@@ -543,6 +584,12 @@ BEGIN
         resp = GET_RDO(cmd)
         RETURN(TRUE)
     ENDIF
+
+    -- setsysvar: set System Variable
+	IF SUB_STR(cmd, 1, 9) = 'setsysvar' THEN
+        resp = SET_SYS_VAR(cmd)
+        RETURN(TRUE)
+	ENDIF
 
     -- if none of the above cmds matched
     WRITE('WRONG COMMAND: ', cmd, CR)
