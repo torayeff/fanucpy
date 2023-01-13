@@ -89,6 +89,13 @@ robot.get_rdo(rdo_num=7)
 robot.set_rdo(rdo_num=7, value=True)
 ```
 
+## Contributions
+External contributions are welcome!
+
+- Agajan Torayev: Key developer
+- Fan Mo: Support with documentation
+- Michael Yiu: External contributor
+
 
 ## RobotApp
 We introduce an experimental feature: Robot Apps. This class facilitates modularity and plug-and-produce functionality. Check the following example apps:
