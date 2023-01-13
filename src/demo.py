@@ -2,7 +2,7 @@ from fanucpy import Robot
 
 robot = Robot(
     robot_model="Fanuc",
-    host="192.168.1.100",
+    host="127.0.0.1",
     port=18735,
     ee_DO_type="RDO",
     ee_DO_num=7,
@@ -12,14 +12,19 @@ robot.__version__()
 
 robot.connect()
 
+# get robot state
+print(f"Current pose: {robot.get_curpos()}")
+print(f"Current joints: {robot.get_curjpos()}")
+print(f"Energy consumption: {robot.get_ins_power()}")
+
 # move in joint space
 robot.move(
     "joint",
-    vals=[19.0, 66.0, -33.0, 18.0, -30.0, -33.0],
+    vals=[10.0, 0.0, 10.0, 0.0, 0.0, 0.0],
     velocity=100,
     acceleration=100,
     cnt_val=0,
-    linear=False
+    linear=False,
 )
 
 # open gripper
@@ -35,10 +40,5 @@ robot.move(
     velocity=50,
     acceleration=50,
     cnt_val=0,
-    linear=False
+    linear=False,
 )
-
-# get robot state
-print(f"Current pose: {robot.get_curpos()}")
-print(f"Current joints: {robot.get_curjpos()}")
-print(f"Energy consumption: {robot.get_ins_power()}")
