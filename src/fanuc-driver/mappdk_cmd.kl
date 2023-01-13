@@ -480,6 +480,9 @@ END SET_RDO
 
 ROUTINE SET_SYS_VAR(cmd: STRING): STRING
 ----------------------------------------------------
+-- Author:              Michael Yiu
+-- Email:               michael.yiu@mksinst.com
+-- Website:             www.mksinst.com
 -- Function: Sets System Variable.
 -- cmd string should follow the below format:
 -- 'setsysvar:n:value'
