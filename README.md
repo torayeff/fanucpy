@@ -102,6 +102,7 @@ We introduce an experimental feature: Robot Apps. This class facilitates modular
 
 1. [Pick and Place App](examples/PickAndPlaceApp.py)
 1. [Aruco Tracking App](examples/ArucoTrackingApp.py)
+1. [FANUC ChatGPT](examples/fanucpy-gpt/README.MD)
 
 ## Citation
 Please use the following to cite if you are using this library in academic publications [Towards Modular and Plug-and-Produce Manufacturing Apps](https://www.sciencedirect.com/science/article/pii/S2212827122004255)
