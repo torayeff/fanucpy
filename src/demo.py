@@ -1,3 +1,4 @@
+import numpy as np
 from fanucpy import Robot
 
 robot = Robot(
@@ -13,32 +14,24 @@ robot.__version__()
 robot.connect()
 
 # get robot state
-print(f"Current pose: {robot.get_curpos()}")
-print(f"Current joints: {robot.get_curjpos()}")
-print(f"Energy consumption: {robot.get_ins_power()}")
+print("Current poses: ")
+cur_pos = robot.get_curpos()
+cur_jpos = robot.get_curjpos()
+print(f"Current pose: {cur_pos}")
+print(f"Current joints: {cur_jpos}")
 
 # move in joint space
 robot.move(
     "joint",
-    vals=[10.0, 0.0, 10.0, 0.0, 0.0, 0.0],
+    vals=np.array(cur_jpos) + 0.5,
     velocity=100,
     acceleration=100,
     cnt_val=0,
     linear=False,
 )
 
-# open gripper
-robot.gripper(True)
-
-# close gripper
-robot.gripper(False)
-
-# move in cartesian space
-robot.move(
-    "pose",
-    vals=[0.0, -28.0, -35.0, 0.0, -55.0, 0.0],
-    velocity=50,
-    acceleration=50,
-    cnt_val=0,
-    linear=False,
-)
+print("Poses after moving: ")
+cur_pos = robot.get_curpos()
+cur_jpos = robot.get_curjpos()
+print(f"Current pose: {cur_pos}")
+print(f"Current joints: {cur_jpos}")

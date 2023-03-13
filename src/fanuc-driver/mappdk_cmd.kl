@@ -325,32 +325,26 @@ BEGIN
 
         IF i=1 THEN
             pose.x = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=2 THEN
             pose.y = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=3 THEN
             pose.z = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=4 THEN
             pose.w = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=5 THEN
             pose.p = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=6 THEN
             pose.r = pval
-            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         start = start + n_chars + 1
