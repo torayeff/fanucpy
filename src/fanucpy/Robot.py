@@ -199,7 +199,7 @@ class Robot(ABC):
 
         # prepare joint values
         for val in vals:
-            vs = f"{abs(val):017.6f}"
+            vs = f"{abs(val):013.6f}"
             if val >= 0:
                 vs = "+" + vs
             else:
