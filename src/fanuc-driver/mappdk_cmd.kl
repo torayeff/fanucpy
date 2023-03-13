@@ -22,7 +22,7 @@ VAR
     cpos:           XYZWPR
 BEGIN
     cpos = CURPOS(0, 0)
-    
+
     CNV_REAL_STR(cpos.x, 8, 3, out)
     resp = '0:x=' + out
 
@@ -40,7 +40,7 @@ BEGIN
 
     CNV_REAL_STR(cpos.r, 8, 3, out)
     resp = resp + ',r=' + out
-    
+
     RETURN(resp)
 END GET_CURPOS
 
@@ -61,16 +61,16 @@ VAR
     joint_vals:     ARRAY[9] OF REAL
     status:         INTEGER
     i:              INTEGER
-    
+
 BEGIN
     jpos = CURJPOS(0, 0)
-    
+
     CNV_JPOS_REL(jpos, joint_vals, status)
     IF status <> 0 THEN
         resp = '1:cannot-convert-joint-vals'
         RETURN(resp)
     ENDIF
-    
+
     resp = '0:'
     FOR i=1 TO ARRAY_LEN(joint_vals) DO
         IF UNINIT(joint_vals[i]) THEN
@@ -83,9 +83,9 @@ BEGIN
         ELSE
             resp = resp + ',j=' + out
         ENDIF
-        
+
     ENDFOR
-    
+
     RETURN(resp)
 END GET_CURJPOS
 
@@ -103,10 +103,10 @@ VAR
     resp:           STRING[254]
     status:         INTEGER
     ins_pwr:        REAL
-    
+
 BEGIN
     GET_VAR(entry, '*SYSTEM*', '$PRO_CFG.$INS_PWR', ins_pwr, status)
-    
+
     IF status <> 0 THEN
         resp = '1:cannot-get-ins_pwr'
         RETURN(resp)
@@ -114,7 +114,7 @@ BEGIN
 
     CNV_REAL_STR(ins_pwr, 6, 6, resp)
     resp = '0:' + resp
-    
+
     RETURN(resp)
 END GET_INS_PWR
 
@@ -154,8 +154,8 @@ VAR
     prog_index:         INTEGER
     resp:               STRING[254]
 
-CONST    
-    n_chars = 18
+CONST
+    n_chars = 14
 BEGIN
     start = 7
 
@@ -196,13 +196,14 @@ BEGIN
     -- Get the number of joints of robot
     CNV_STR_INT(SUB_STR(cmd, start, 1), nj)
     start = start + 1 + 1
-    
+
     -- Read joint values from the cmd string
     -- and convert the joint values to JOINTPOS6
     FOR i=1 TO nj DO
         CNV_STR_REAL(SUB_STR(cmd, start, n_chars), jval)
         joint_vals[i] = jval
         start = start + n_chars + 1
+        -- WRITE('Value ', i, ': ', jval, CR)
     ENDFOR
     CNV_REL_JPOS(joint_vals, jpos, status)
     IF status <> 0 THEN
@@ -275,7 +276,7 @@ VAR
     resp:               STRING[254]
 
 CONST
-    n_chars = 18
+    n_chars = 14
 BEGIN
     start = 7
 
@@ -316,7 +317,7 @@ BEGIN
     -- Get the number of joints of robot
     CNV_STR_INT(SUB_STR(cmd, start, 1), nj)
     start = start + 1 + 1
-    
+
     -- Read pose values from the cmd string
     pose = CURPOS(0, 0)
     FOR i=1 TO nj DO
@@ -324,31 +325,37 @@ BEGIN
 
         IF i=1 THEN
             pose.x = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=2 THEN
             pose.y = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=3 THEN
             pose.z = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=4 THEN
             pose.w = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=5 THEN
             pose.p = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         IF i=6 THEN
             pose.r = pval
+            -- WRITE('Value ', i, ': ', pval, CR)
         ENDIF
 
         start = start + n_chars + 1
     ENDFOR
-    
+
     CHECK_EPOS ((pose), $UFRAME, $UTOOL, status)
     IF status <> 0 THEN
         resp = '1:position-is-not-reachable'
@@ -396,7 +403,7 @@ BEGIN
     -- Get prog name from 'mappdkcall:PROG_NAME'
     prg_name = SUB_STR(cmd, 12, STR_LEN(cmd) - 11)
     CALL_PROGLIN(prg_name, 1, prog_index, FALSE)
-    
+
     resp = '0:success'
     RETURN(resp)
 END MAPPDKCALL
@@ -419,7 +426,7 @@ VAR
 BEGIN
     -- Get RDO number
     CNV_STR_INT(SUB_STR(cmd, 8, 1), rdo_num)
-    
+
     IF RDO[rdo_num] = TRUE THEN
         RDO[rdo_num] = TRUE
         resp = '0:1'
@@ -460,7 +467,7 @@ BEGIN
 
     -- Get RDO value
     rdo_val = SUB_STR(cmd, 10, STR_LEN(cmd) - 9)
-    
+
     IF rdo_val = 'true' THEN
         RDO[rdo_num] = TRUE
         resp = '0:success'
@@ -504,7 +511,7 @@ BEGIN
 
 	-- Get System Variable value
 	sys_val = SUB_STR(cmd, 10 + STR_LEN(sys_var) + 2, 1)
-	
+
 	IF sys_val = 'T' THEN
 		SET_VAR(entry, '*SYSTEM*', sys_var, TRUE, status)
 		resp = '0:success'
@@ -523,7 +530,7 @@ BEGIN
 END SET_SYS_VAR
 
 
-ROUTINE HANDLE_CMD(cmd: STRING; 
+ROUTINE HANDLE_CMD(cmd: STRING;
                    resp: STRING) : BOOLEAN
 ----------------------------------------------------
 -- Function: Handles commands.
@@ -557,7 +564,7 @@ BEGIN
         resp = GET_INS_PWR(cmd)
         RETURN(TRUE)
     ENDIF
-    
+
     -- movej
     IF SUB_STR(cmd, 1, 5) = 'movej' THEN
         resp = MOVEJ(cmd)
@@ -569,7 +576,7 @@ BEGIN
         resp = MOVEP(cmd)
         RETURN(TRUE)
     ENDIF
-    
+
     -- mappdkcall: call external TP program
     IF SUB_STR(cmd, 1, 10) = 'mappdkcall' THEN
         resp = MAPPDKCALL(cmd)
