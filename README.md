@@ -88,9 +88,9 @@ robot.set_rdo(rdo_num=7, value=True)
 External contributions are welcome!
 
 - Agajan Torayev: Key developer
+- Karol
 - Fan Mo: Support with documentation
 - Michael Yiu: External contributor
-- Karol
 
 
 ## RobotApp
