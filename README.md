@@ -1,10 +1,5 @@
 # fanucpy: Python package for FANUC industrial robots
 
-## Acknowledgements
-This work was developed at the [Institute for Advanced Manufacturing at the University of Nottingham](https://www.nottingham.ac.uk/ifam/index.aspx) as a part of the [Digital Manufacturing and Design Training Network](https://dimanditn.eu/).
-
-This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No 814078.
-
 ## Software contents
 The package consists of two parts: 
 1. Robot interface code written in Python programming language
@@ -95,6 +90,7 @@ External contributions are welcome!
 - Agajan Torayev: Key developer
 - Fan Mo: Support with documentation
 - Michael Yiu: External contributor
+- Karol
 
 
 ## RobotApp
@@ -117,3 +113,8 @@ Please use the following to cite if you are using this library in academic publi
   publisher={Elsevier}
 }
 ```
+
+## Acknowledgements
+This work was developed at the [Institute for Advanced Manufacturing at the University of Nottingham](https://www.nottingham.ac.uk/ifam/index.aspx) as a part of the [Digital Manufacturing and Design Training Network](https://dimanditn.eu/).
+
+This project has received funding from the European Union’s Horizon 2020 research and innovation programme under the Marie Skłodowska-Curie grant agreement No 814078.
