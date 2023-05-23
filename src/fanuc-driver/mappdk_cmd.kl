@@ -479,6 +479,82 @@ BEGIN
 
 END SET_RDO
 
+
+ROUTINE GET_DOUT(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Gets digital out.
+-- cmd string should follow the below format:
+-- 'getdout:n'
+-- n: a single digit number
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    dout_num:            INTEGER
+BEGIN
+    -- Get DOUT number
+    CNV_STR_INT(SUB_STR(cmd, 9, 1), dout_num)
+
+    IF DOUT[dout_num] = TRUE THEN
+        DOUT[dout_num] = TRUE
+        resp = '0:1'
+        RETURN(resp)
+    ENDIF
+
+    IF DOUT[dout_num] = FALSE THEN
+        DOUT[dout_num] = FALSE
+        resp = '0:0'
+        RETURN(resp)
+    ENDIF
+
+    resp = '1:wrong-dout-value'
+    RETURN(resp)
+
+END GET_DOUT
+
+ROUTINE SET_DOUT(cmd: STRING): STRING
+----------------------------------------------------
+-- Function: Sets digital out.
+-- cmd string should follow the below format:
+-- 'setdout:n:value'
+-- n: a single digit number
+-- value: 'true' or 'false' (lowercase)
+----------------------------------------------------
+-- Arguments:
+--      cmd [IN]:           command string.
+----------------------------------------------------
+-- Return value: response string.
+----------------------------------------------------
+VAR
+    dout_num:            INTEGER
+    dout_val:            STRING[8]
+BEGIN
+    -- Get DOUT number
+    CNV_STR_INT(SUB_STR(cmd, 9, 1), dout_num)
+
+    -- Get DOUT value
+    dout_val = SUB_STR(cmd, 11, STR_LEN(cmd) - 10)
+
+    IF dout_val = 'true' THEN
+        DOUT[dout_num] = TRUE
+        resp = '0:success'
+        RETURN(resp)
+    ENDIF
+
+    IF dout_val = 'false' THEN
+        DOUT[dout_num] = FALSE
+        resp = '0:success'
+        RETURN(resp)
+    ENDIF
+
+    resp = '1:wrong-dout-value'
+    RETURN(resp)
+
+END SET_DOUT
+
 ROUTINE SET_SYS_VAR(cmd: STRING): STRING
 ----------------------------------------------------
 -- Author:              Michael Yiu
@@ -586,6 +662,18 @@ BEGIN
     -- getrdo: get Robot Digital Output
     IF SUB_STR(cmd, 1, 6) = 'getrdo' THEN
         resp = GET_RDO(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+     -- setdout: set Digital Output
+    IF SUB_STR(cmd, 1, 7) = 'setdout' THEN
+        resp = SET_DOUT(cmd)
+        RETURN(TRUE)
+    ENDIF
+
+    -- getdout: get Digital Output
+    IF SUB_STR(cmd, 1, 7) = 'getdout' THEN
+        resp = GET_DOUT(cmd)
         RETURN(TRUE)
     ENDIF
 

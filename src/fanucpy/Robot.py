@@ -40,7 +40,7 @@ class Robot(ABC):
         self.ERROR_CODE = 1
 
     def __version__(self):
-        print("MAPPDK Robot class v0.1.11")
+        print("MAPPDK Robot class v0.1.12")
 
     def handle_response(self, resp: str, verbose: bool = False):
         """Handles response from socket communication.
@@ -257,6 +257,34 @@ class Robot(ABC):
         else:
             val = "false"
         cmd = f"setrdo:{rdo_num}:{val}"
+        self.send_cmd(cmd)
+
+    def get_dout(self, dout_num: int):
+        """Get DOUT value.
+
+        Args:
+            dout_num (int): DOUT number.
+
+        Returns:
+            dout_value: DOUT value.
+        """
+        cmd = f"getdout:{dout_num}"
+        _, dout_value = self.send_cmd(cmd)
+        dout_value = int(dout_value)
+        return dout_value
+
+    def set_dout(self, dout_num: int, val: bool):
+        """Sets DOUT value.
+
+        Args:
+            dout_num (int): DOUT number.
+            val (bool): Value.
+        """
+        if val:
+            val = "true"
+        else:
+            val = "false"
+        cmd = f"setdout:{dout_num}:{val}"
         self.send_cmd(cmd)
 
     def set_sys_var(self, sys_var: str, val: bool):
