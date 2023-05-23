@@ -84,6 +84,12 @@ robot.get_rdo(rdo_num=7)
 robot.set_rdo(rdo_num=7, value=True)
 ```
 
+### Get/Set DOUT
+```python
+robot.get_rdo(dout_num=1)
+robot.set_rdo(dout_num=1, value=True)
+```
+
 ## Contributions
 External contributions are welcome!
 
