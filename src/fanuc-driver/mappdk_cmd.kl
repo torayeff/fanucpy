@@ -485,7 +485,7 @@ ROUTINE GET_DOUT(cmd: STRING): STRING
 -- Function: Gets digital out.
 -- cmd string should follow the below format:
 -- 'getdout:n'
--- n: a single digit number
+-- n: a 5 digit number with leading zeros
 ----------------------------------------------------
 -- Arguments:
 --      cmd [IN]:           command string.
@@ -496,7 +496,7 @@ VAR
     dout_num:            INTEGER
 BEGIN
     -- Get DOUT number
-    CNV_STR_INT(SUB_STR(cmd, 9, 1), dout_num)
+    CNV_STR_INT(SUB_STR(cmd, 9, 5), dout_num)
 
     IF DOUT[dout_num] = TRUE THEN
         DOUT[dout_num] = TRUE
@@ -520,7 +520,7 @@ ROUTINE SET_DOUT(cmd: STRING): STRING
 -- Function: Sets digital out.
 -- cmd string should follow the below format:
 -- 'setdout:n:value'
--- n: a single digit number
+-- n: a 5 digit number with leading zeros
 -- value: 'true' or 'false' (lowercase)
 ----------------------------------------------------
 -- Arguments:
@@ -533,10 +533,10 @@ VAR
     dout_val:            STRING[8]
 BEGIN
     -- Get DOUT number
-    CNV_STR_INT(SUB_STR(cmd, 9, 1), dout_num)
+    CNV_STR_INT(SUB_STR(cmd, 9, 5), dout_num)
 
     -- Get DOUT value
-    dout_val = SUB_STR(cmd, 11, STR_LEN(cmd) - 10)
+    dout_val = SUB_STR(cmd, 15, STR_LEN(cmd) - 14)
 
     IF dout_val = 'true' THEN
         DOUT[dout_num] = TRUE

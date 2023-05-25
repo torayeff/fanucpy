@@ -268,7 +268,7 @@ class Robot(ABC):
         Returns:
             dout_value: DOUT value.
         """
-        cmd = f"getdout:{dout_num}"
+        cmd = f"getdout:{str(dout_num).zfill(5)}"
         _, dout_value = self.send_cmd(cmd)
         dout_value = int(dout_value)
         return dout_value
@@ -284,7 +284,7 @@ class Robot(ABC):
             val = "true"
         else:
             val = "false"
-        cmd = f"setdout:{dout_num}:{val}"
+        cmd = f"setdout:{str(dout_num).zfill(5)}:{val}"
         self.send_cmd(cmd)
 
     def set_sys_var(self, sys_var: str, val: bool):
