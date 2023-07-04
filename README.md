@@ -10,7 +10,7 @@ The communication protocol between the Python package and the FANUC robot contro
 
 ## Python package installation
 ```bash
-pip install fanucpy
+pip install -U fanucpy
 ```
 
 ## Driver installation
