@@ -95,7 +95,7 @@ External contributions are welcome!
 
 - Agajan Torayev: Key developer
 - Karol
-- Fan Mo: Support with documentation
+- Fan Mo
 - Michael Yiu: External contributor
 
 
