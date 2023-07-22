@@ -1,0 +1,10 @@
+cff-version: 0.0.1
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Torayev"
+  given-names: "Agajan"
+  orcid: "https://orcid.org/0000-0002-8141-5704"
+title: "fanucpy"
+version: 0.1.13
+date-released: 2022-01-01
+url: "https://github.com/torayeff/fanucpy"
