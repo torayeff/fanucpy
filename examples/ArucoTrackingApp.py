@@ -1,9 +1,10 @@
 import sys
 
-from cv2 import cv2
 import numpy as np
+from cv2 import cv2
+
 from fanucpy import RobotApp
-from fanucpy.Calibration import Calibration
+from fanucpy.calibration import Calibration
 
 
 class ArucoTrackingApp(RobotApp):

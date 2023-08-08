@@ -1,5 +1,5 @@
-from abc import ABC, abstractmethod
 import traceback
+from abc import ABC, abstractmethod
 
 
 class RobotApp(ABC):

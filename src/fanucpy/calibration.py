@@ -1,7 +1,8 @@
-from cv2 import cv2
-import pickle
-import numpy as np
 import os
+import pickle
+
+import numpy as np
+from cv2 import cv2
 
 
 def save_calib_data(calib_data: object, calib_data_path: str):
@@ -230,7 +231,6 @@ def collect_eye_hand_data(
 def calibrate_eye_hand(
     R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, eye_to_hand=True
 ):
-
     tts = []
     if eye_to_hand:
         # change coordinates from gripper2base to base2gripper
