@@ -1,9 +1,10 @@
-import openai
-import subprocess
 import json
+import subprocess
+
+import openai
 
 # open reference code
-with open("reference.py", "r") as f:
+with open("reference.py") as f:
     ref_code = " ".join(f.readlines())
 
 # prepare API call
@@ -23,7 +24,7 @@ while True:
         "content": "Only using functions in the reference code "
         f"write a full code with all necessary imports for the following task: {cmd}"
         "If the task starts with remember ensure the code contains print."
-        "Otherwise there is no need for explanation an do not output anything.```"
+        "Otherwise there is no need for explanation an do not output anything.```",
     }
     messages.append(msg)
 

@@ -1,2 +1,2 @@
-from .Robot import Robot
-from .RobotApp import RobotApp
+from fanucpy.robot import Robot
+from fanucpy.robotapp import RobotApp
