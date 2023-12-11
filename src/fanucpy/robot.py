@@ -1,7 +1,3 @@
-"""Rewrite of the fanucpy robot class.
-
-The rewrite is needed as the original class isn't working as we need it.
-"""
 from __future__ import annotations
 
 import socket
@@ -47,9 +43,6 @@ class Robot:
         self.comm_sock: socket.socket
         self.SUCCESS_CODE = 0
         self.ERROR_CODE = 1
-
-    def __version__(self) -> None:
-        print("MAPPDK Robot class v0.1.13")
 
     def handle_response(
         self, resp: str, continue_on_error: bool = False
@@ -277,13 +270,13 @@ class Robot:
         return self.send_cmd(cmd, continue_on_error=continue_on_error)
 
     def get_dout(self, dout_num: int) -> int:
-        """Get DOUBT value.
+        """Get DOUT value.
 
         Args:
-            dout_num (int): DOUBT number.
+            dout_num (int): DOUT number.
 
         Returns:
-            dout_value: DOUBT value.
+            dout_value: DOUT value.
         """
         cmd = f"getdout:{str(dout_num).zfill(5)}"
         _, dout_value_ = self.send_cmd(cmd)
@@ -296,10 +289,10 @@ class Robot:
         val: bool,
         continue_on_error: bool = False,
     ) -> tuple[Literal[0, 1], str]:
-        """Sets DOUBT value.
+        """Sets DOUT value.
 
         Args:
-            dout_num (int): DOUBT number.
+            dout_num (int): DOUT number.
             val (bool): Value.
         """
         cmd = f"setdout:{str(dout_num).zfill(5)}:{str(val).lower()}"
@@ -320,3 +313,25 @@ class Robot:
         val_ = "T" if val else "F"
         cmd = f"setsysvar:{sys_var}:{val_}"
         return self.send_cmd(cmd, continue_on_error=continue_on_error)
+
+
+if __name__ == "__main__":
+    robot = Robot(
+        robot_model="Fanuc",
+        host="10.211.55.3",
+        port=18735,
+        ee_DO_type="RDO",
+        ee_DO_num=7,
+    )
+
+    robot.connect()
+
+    # move in joint space
+    robot.move(
+        "joint",
+        vals=[19.0, 66.0, -33.0, 18.0, -30.0, -33.0],
+        velocity=100,
+        acceleration=100,
+        cnt_val=0,
+        linear=False,
+    )
