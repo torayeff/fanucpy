@@ -1,16 +1,13 @@
 import numpy as np
-
 from fanucpy import Robot
 
 robot = Robot(
     robot_model="Fanuc",
-    host="127.0.0.1",
+    host="10.211.55.3",
     port=18735,
     ee_DO_type="RDO",
     ee_DO_num=7,
 )
-
-robot.__version__()
 
 robot.connect()
 

@@ -329,9 +329,20 @@ if __name__ == "__main__":
     # move in joint space
     robot.move(
         "joint",
-        vals=[19.0, 66.0, -33.0, 18.0, -30.0, -33.0],
+        vals=[0, 0, 0, 0, 0, 0],
         velocity=100,
         acceleration=100,
         cnt_val=0,
-        linear=False,
+        linear=not False,
+    )
+    print(robot.get_curpos())
+
+    # move in cartesian space
+    robot.move(
+        "pose",
+        vals=[350, 0, 280, -15, -90, -160],
+        velocity=100,
+        acceleration=100,
+        cnt_val=0,
+        linear=not False,
     )
